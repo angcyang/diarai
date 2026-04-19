@@ -37,7 +37,6 @@ if not exist ".git" (
     git branch -M main
 ) else (
     echo [1/6] Git 仓库已存在
-    REM 确保使用 main 分支
     git branch -M main
 )
 
@@ -63,7 +62,7 @@ git add .
 
 echo.
 echo [5/6] 提交文件...
-git commit -m "DiarAI - AI智能日记应用 v1.0"
+git commit -m "Fix Dockerfile for Railway deployment"
 
 echo.
 echo [6/6] 推送到 GitHub...
@@ -75,11 +74,7 @@ if %errorlevel% equ 0 (
     echo     上传成功！
     echo ========================================
     echo.
-    echo 下一步：
-    echo 1. 打开 https://railway.app
-    echo 2. 用 GitHub 登录
-    echo 3. 点击 "New Project" -^> "Deploy from GitHub"
-    echo 4. 选择 diarai 仓库
+    echo 请在 Railway 重新部署！
     echo.
 ) else (
     echo.
