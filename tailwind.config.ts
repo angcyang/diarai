@@ -44,6 +44,19 @@ const config: Config = {
         success: '#a6e3a1',
         warning: '#f9e2af',
         danger: '#f38ba8',
+        background: '#1e1e2e',
+        foreground: '#cdd6f4',
+        card: '#313244',
+        'card-foreground': '#cdd6f4',
+        popover: '#313244',
+        'popover-foreground': '#cdd6f4',
+        muted: '#45475a',
+        'muted-foreground': '#a6adc8',
+        destructive: '#f38ba8',
+        'destructive-foreground': '#1e1e2e',
+        border: '#45475a',
+        input: '#45475a',
+        ring: '#89b4fa',
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -79,9 +92,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [],
 }
 
 export default config
