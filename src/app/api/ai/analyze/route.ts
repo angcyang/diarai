@@ -28,9 +28,15 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json({
-        ...existing,
-        keywords: JSON.parse(existing.keywords || '[]'),
-        tags: JSON.parse(existing.tags || '[]')
+        id: existing.id,
+        entry_id: existing.entry_id,
+        model: existing.model,
+        summary: existing.summary,
+        emotion: existing.emotion,
+        keywords: JSON.parse((existing as any).keywords || '[]'),
+        tags: JSON.parse((existing as any).tags || '[]'),
+        advice: existing.advice,
+        created_at: existing.created_at
       })
     }
 
