@@ -32,15 +32,17 @@ git config --global user.name "angcyang"
 
 REM 检查是否是git仓库
 if not exist ".git" (
-    echo [1/5] 初始化 Git 仓库...
+    echo [1/6] 初始化 Git 仓库...
     git init
     git branch -M main
 ) else (
-    echo [1/5] Git 仓库已存在
+    echo [1/6] Git 仓库已存在
+    REM 确保使用 main 分支
+    git branch -M main
 )
 
 echo.
-echo [2/5] 配置远程仓库
+echo [2/6] 配置远程仓库
 
 REM 检查远程仓库配置
 git remote -v 2>nul | findstr "origin" >nul
@@ -52,16 +54,20 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [3/5] 添加所有文件...
+echo [3/6] 确保是 main 分支...
+git branch --show-current
+
+echo.
+echo [4/6] 添加所有文件...
 git add .
 
 echo.
-echo [4/5] 提交文件...
+echo [5/6] 提交文件...
 git commit -m "DiarAI - AI智能日记应用 v1.0"
 
 echo.
-echo [5/5] 推送到 GitHub...
-git push -u origin main
+echo [6/6] 推送到 GitHub...
+git push -u origin main --force
 
 if %errorlevel% equ 0 (
     echo.
