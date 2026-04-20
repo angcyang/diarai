@@ -24,7 +24,7 @@ export async function GET(
       SELECT * FROM ai_analyses WHERE entry_id = ? ORDER BY created_at DESC LIMIT 1
     `).get(id)
 
-    return NextResponse.json({ ...entry, tags, analysis })
+    return NextResponse.json({ ...entry as object, tags, analysis })
   } catch (error) {
     console.error('GET entry error:', error)
     return NextResponse.json({ error: 'Failed to fetch entry' }, { status: 500 })
@@ -64,7 +64,7 @@ export async function PUT(
       WHERE et.entry_id = ?
     `).all(id)
 
-    return NextResponse.json({ ...entry, tags })
+    return NextResponse.json({ ...entry as object, tags })
   } catch (error) {
     console.error('PUT entry error:', error)
     return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 })
