@@ -9,7 +9,7 @@ export async function GET(
     await db.ensureInit()
     const { id } = params
 
-    const entry = db.prepare('SELECT * FROM entries WHERE id = ?').get(id)
+    const entry = db.prepare('SELECT * FROM entries WHERE id = ?').get(id) as { id: string; [key: string]: unknown } | undefined
 
     if (!entry) {
       return NextResponse.json({ error: 'Entry not found' }, { status: 404 })
