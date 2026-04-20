@@ -1,0 +1,17 @@
+{
+  "name": "ai-diary-app",
+  "version": "1.0.0",
+  "description": "AI智能日记应用 - 支持AI引导写作、情绪分析和个人报告生成",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["diary", "ai", "emotion-analysis"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
