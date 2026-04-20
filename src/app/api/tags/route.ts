@@ -17,10 +17,10 @@ export async function GET(request: NextRequest) {
 
     query += ' ORDER BY type, name'
 
-    const tags = db.prepare(query).all(...params)
+    const tags = db.prepare(query).all(...params) as { id: string; name: string; type: string; color: string | null }[]
 
     // Get usage count for each tag
-    const tagsWithCount = tags.map((tag: { id: string; name: string; type: string; color: string | null }) => {
+    const tagsWithCount = tags.map((tag) => {
       const { count } = db.prepare(`
         SELECT COUNT(*) as count FROM entry_tags WHERE tag_id = ?
       `).get(tag.id) as { count: number }
