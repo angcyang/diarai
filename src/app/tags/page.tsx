@@ -163,9 +163,9 @@ export default function TagsPage() {
                 <div
                   key={tag.id}
                   className="group flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
-                  style={{ backgroundColor: `${tag.color}20` }}
+                  style={{ backgroundColor: `${tag.color || '#888'}20` }}
                 >
-                  <span className="font-medium" style={{ color: tag.color }}>
+                  <span className="font-medium" style={{ color: tag.color || '#888' }}>
                     {tag.name}
                   </span>
                   <span className="text-xs text-subtext0">({tag.count})</span>
@@ -207,9 +207,9 @@ export default function TagsPage() {
                 <div
                   key={tag.id}
                   className="group flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
-                  style={{ backgroundColor: `${tag.color}20` }}
+                  style={{ backgroundColor: `${tag.color || '#888'}20` }}
                 >
-                  <span className="font-medium" style={{ color: tag.color }}>
+                  <span className="font-medium" style={{ color: tag.color || '#888' }}>
                     {tag.name}
                   </span>
                   <span className="text-xs text-subtext0">({tag.count})</span>

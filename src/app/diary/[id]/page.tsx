@@ -171,7 +171,7 @@ export default function DiaryDetailPage() {
                   <span
                     key={tag.id}
                     className="px-3 py-1 rounded-full text-sm"
-                    style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                    style={{ backgroundColor: `${tag.color || '#888'}20`, color: tag.color || '#888' }}
                   >
                     {tag.name}
                   </span>
@@ -180,7 +180,7 @@ export default function DiaryDetailPage() {
                   <span
                     key={tag.id}
                     className="px-3 py-1 rounded-full text-sm"
-                    style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                    style={{ backgroundColor: `${tag.color || '#888'}20`, color: tag.color || '#888' }}
                   >
                     {tag.name}
                   </span>

@@ -198,7 +198,7 @@ export default function DiaryPage() {
                         <span
                           key={tag.id}
                           className="px-2 py-0.5 rounded text-xs"
-                          style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                          style={{ backgroundColor: `${tag.color || '#888'}20`, color: tag.color || '#888' }}
                         >
                           {tag.name}
                         </span>
@@ -258,7 +258,7 @@ export default function DiaryPage() {
                                   <span
                                     key={tag.id}
                                     className="px-2 py-0.5 rounded text-xs"
-                                    style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                    style={{ backgroundColor: `${tag.color || '#888'}20`, color: tag.color || '#888' }}
                                   >
                                     {tag.name}
                                   </span>
