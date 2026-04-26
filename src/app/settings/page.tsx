@@ -201,19 +201,19 @@ export default function SettingsPage() {
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* AI 配置 */}
+        {/* AI 配置 - 简化版 */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Key className="w-5 h-5" />
-              AI 配置
+              🤖 AI 模型配置
             </CardTitle>
-            <CardDescription>配置 AI 模型连接信息</CardDescription>
+            <CardDescription>配置AI服务以启用智能功能</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* AI 名称 */}
             <div>
-              <label className="text-sm font-medium mb-2 block">AI 模型</label>
+              <label className="text-sm font-medium mb-2 block">AI 服务</label>
               <select
                 value={aiProvider}
                 onChange={(e) => handleProviderChange(e.target.value as ProviderType)}
@@ -225,7 +225,7 @@ export default function SettingsPage() {
               </select>
             </div>
 
-            {/* API 地址 */}
+            {/* API 地址 - 可修改的默认值 */}
             <div>
               <label className="text-sm font-medium mb-2 block">Base URL</label>
               <Input
@@ -293,7 +293,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="w-5 h-5" />
-              数据备份与恢复
+              数据备份
             </CardTitle>
             <CardDescription>导出或导入你的日记数据</CardDescription>
           </CardHeader>
@@ -320,7 +320,7 @@ export default function SettingsPage() {
                 清除所有数据
               </Button>
               <p className="text-xs text-subtext0 mt-2">
-                此操作将永久删除所有日记和设置，且无法恢复
+                此操作将永久删除所有日记和设置
               </p>
             </div>
           </CardContent>
@@ -335,10 +335,8 @@ export default function SettingsPage() {
             <div className="space-y-2 text-sm text-subtext0">
               <p>版本: 1.0.0</p>
               <p>技术栈: Next.js 14 + SQLite + Tailwind CSS</p>
-              <p>数据存储: 本地 SQLite 数据库</p>
               <p className="pt-2">
-                DiarAI 是一款注重隐私的 AI 日记工具，所有数据都存储在本地，
-                无需登录，无云端上传。
+                DiarAI 是一款注重隐私的 AI 日记工具，所有数据都存储在本地。
               </p>
             </div>
           </CardContent>

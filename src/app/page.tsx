@@ -1,18 +1,15 @@
 'use client'
 
 import { AppShell } from '@/components/layout/AppShell'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Slider } from '@/components/ui/Slider'
-import { Badge } from '@/components/ui/Badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/Dialog'
 import { useState, useEffect } from 'react'
 import { formatDate, getDateString, countWords } from '@/lib/utils'
-import { EMOTION_LABELS, MEANING_LABELS, EmotionType } from '@/types'
-import { Send, Sparkles, BookOpen, ChevronRight, Loader2, Heart } from 'lucide-react'
+import { Send, Sparkles, BookOpen, ChevronRight, Loader2, FileText, Upload, PenLine } from 'lucide-react'
 
 interface Tag {
   id: string
@@ -26,18 +23,42 @@ interface GuideMessage {
   content: string
 }
 
+// 功能说明
+const FEATURES = {
+  write: {
+    title: '✏️ 自由写作',
+    description: '直接记录今天发生的事情，抒发内心感受',
+    icon: PenLine
+  },
+  guide: {
+    title: '💬 AI引导',
+    description: '通过AI对话引导，深入挖掘今天的经历和感受',
+    icon: Sparkles
+  },
+  import: {
+    title: '📂 导入日记',
+    description: '从JSON文件批量导入之前导出的日记',
+    icon: Upload
+  }
+}
+
 export default function WritePage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [moodScore, setMoodScore] = useState(5)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tags, setTags] = useState<Tag[]>([])
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  
+  // AI引导相关状态
   const [isGuiding, setIsGuiding] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
   const [guideMessages, setGuideMessages] = useState<GuideMessage[]>([])
   const [userInput, setUserInput] = useState('')
+  
+  // 导入相关状态
+  const [isImporting, setIsImporting] = useState(false)
+  
   const [showSuccess, setShowSuccess] = useState(false)
 
   // Mood color map
@@ -68,38 +89,6 @@ export default function WritePage() {
     }
   }
 
-  // Analyze content
-  const handleAnalyze = async () => {
-    if (!content.trim()) return
-    
-    setIsAnalyzing(true)
-    try {
-      // For now, use simple analysis
-      const response = await fetch('/api/ai/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          entry_id: 'preview',
-          content
-        })
-      })
-      const data = await response.json()
-      
-      // Auto-select emotion based on analysis
-      const emotionTag = tags.find(t => t.name.includes(data.emotion))
-      if (emotionTag) {
-        setSelectedTags(prev => [...prev.filter(t => !tags.find(tag => tag.id === t)?.type.includes('emotion')), emotionTag.id])
-      }
-      
-      // Show analysis result
-      alert(`分析结果：\n情绪：${data.emotion}\n摘要：${data.summary}\n建议：${data.advice}`)
-    } catch (error) {
-      console.error('Analysis error:', error)
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
-
   // Save diary
   const handleSave = async () => {
     if (!content.trim()) return
@@ -120,7 +109,6 @@ export default function WritePage() {
       
       if (res.ok) {
         setShowSuccess(true)
-        // Reset form
         setTitle('')
         setContent('')
         setMoodScore(5)
@@ -134,62 +122,6 @@ export default function WritePage() {
     }
   }
 
-  // 导入日记文件
-  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    try {
-      const text = await file.text()
-      const data = JSON.parse(text)
-      
-      if (Array.isArray(data)) {
-        let successCount = 0
-        for (const entry of data) {
-          const res = await fetch('/api/diary', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              date: entry.date || getDateString(),
-              title: entry.title || `导入日记`,
-              content: entry.content || entry.text || '',
-              mood_score: entry.mood_score || entry.mood || 5,
-              tagIds: entry.tagIds || []
-            })
-          })
-          if (res.ok) successCount++
-        }
-        alert(`成功导入 ${successCount} 篇日记`)
-        window.location.reload()
-      } else if (data.entries && Array.isArray(data.entries)) {
-        let successCount = 0
-        for (const entry of data.entries) {
-          const res = await fetch('/api/diary', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              date: entry.date || getDateString(),
-              title: entry.title || `导入日记`,
-              content: entry.content || entry.text || '',
-              mood_score: entry.mood_score || entry.mood || 5,
-              tagIds: entry.tagIds || []
-            })
-          })
-          if (res.ok) successCount++
-        }
-        alert(`成功导入 ${successCount} 篇日记`)
-        window.location.reload()
-      } else {
-        alert('文件格式不正确')
-      }
-    } catch (error) {
-      alert('导入失败：' + (error as Error).message)
-    }
-    
-    // 清空 input
-    e.target.value = ''
-  }
-
   // Start guide mode
   const startGuide = async () => {
     setShowGuide(true)
@@ -197,7 +129,7 @@ export default function WritePage() {
     
     // Initial AI greeting
     setGuideMessages([
-      { type: 'ai', content: '嗨！很高兴和你聊天 😊' }
+      { type: 'ai', content: '嗨！很高兴和你聊天 😊\n\n我们来聊聊今天吧，想先分享什么？' }
     ])
     
     setIsGuiding(false)
@@ -232,6 +164,54 @@ export default function WritePage() {
     }
   }
 
+  // 导入日记文件
+  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsImporting(true)
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      
+      let successCount = 0
+      let entries: any[] = []
+      
+      if (Array.isArray(data)) {
+        entries = data
+      } else if (data.entries && Array.isArray(data.entries)) {
+        entries = data.entries
+      } else {
+        alert('文件格式不正确')
+        setIsImporting(false)
+        return
+      }
+      
+      for (const entry of entries) {
+        const res = await fetch('/api/diary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: entry.date || getDateString(),
+            title: entry.title || `导入日记`,
+            content: entry.content || entry.text || '',
+            mood_score: entry.mood_score || entry.mood || 5,
+            tagIds: entry.tagIds || []
+          })
+        })
+        if (res.ok) successCount++
+      }
+      
+      alert(`成功导入 ${successCount} 篇日记`)
+      window.location.reload()
+    } catch (error) {
+      alert('导入失败：' + (error as Error).message)
+    } finally {
+      setIsImporting(false)
+      e.target.value = ''
+    }
+  }
+
   // Toggle tag selection
   const toggleTag = (tagId: string) => {
     setSelectedTags(prev => 
@@ -254,6 +234,22 @@ export default function WritePage() {
           </div>
         )}
 
+        {/* 功能选择说明 */}
+        <div className="grid grid-cols-3 gap-4">
+          {Object.entries(FEATURES).map(([key, feature]) => {
+            const Icon = feature.icon
+            return (
+              <Card key={key} className="hover:border-primary/50 transition-colors">
+                <CardContent className="p-4 text-center">
+                  <Icon className="w-8 h-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-medium">{feature.title.replace(/^[^\s]+\s/, '')}</h3>
+                  <p className="text-xs text-subtext0 mt-1">{feature.description}</p>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
         {/* Writing Mode Tabs */}
         <Tabs defaultValue="write" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -262,7 +258,7 @@ export default function WritePage() {
             <TabsTrigger value="import">📂 导入</TabsTrigger>
           </TabsList>
 
-          {/* Free Write Mode */}
+          {/* Free Write Mode - 自由写作：直接记录 */}
           <TabsContent value="write" className="space-y-6 animate-in">
             <Card>
               <CardContent className="p-6 space-y-4">
@@ -276,7 +272,7 @@ export default function WritePage() {
 
                 {/* Content */}
                 <Textarea
-                  placeholder="今天发生了什么？写下你的故事..."
+                  placeholder="记录今天发生的事情..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="min-h-[300px] text-base"
@@ -341,13 +337,9 @@ export default function WritePage() {
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-4">
-                  <Button onClick={handleAnalyze} disabled={!content.trim() || isAnalyzing}>
-                    {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    AI分析
-                  </Button>
-                  <Button onClick={handleSave} disabled={!content.trim() || isSaving} className="flex-1">
+                {/* Save Button */}
+                <div className="pt-4">
+                  <Button onClick={handleSave} disabled={!content.trim() || isSaving} className="w-full">
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4" />}
                     保存日记
                   </Button>
@@ -356,7 +348,7 @@ export default function WritePage() {
             </Card>
           </TabsContent>
 
-          {/* Guide Mode */}
+          {/* Guide Mode - AI引导：通过对话深入探索 */}
           <TabsContent value="guide" className="space-y-4">
             {!showGuide ? (
               <Card className="text-center py-12">
@@ -365,7 +357,12 @@ export default function WritePage() {
                     <Sparkles className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">AI引导写作</h3>
-                  <p className="text-subtext0 mb-6">让我通过对话引导你记录今天的故事</p>
+                  <p className="text-subtext0 mb-2">
+                    通过对话深入探索今天的经历
+                  </p>
+                  <p className="text-sm text-subtext0 mb-6">
+                    AI会提出一些问题，帮助你更好地回顾和记录
+                  </p>
                   <Button onClick={startGuide} size="lg">
                     开始对话 <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -419,26 +416,41 @@ export default function WritePage() {
             )}
           </TabsContent>
 
-          {/* Import Mode */}
+          {/* Import Mode - 导入：批量导入JSON */}
           <TabsContent value="import" className="space-y-4">
             <Card>
               <CardContent className="p-6">
                 <div className="border-2 border-dashed border-surface0 rounded-xl p-8 text-center">
-                  <BookOpen className="w-12 h-12 mx-auto mb-4 text-subtext0" />
-                  <h3 className="text-lg font-medium mb-2">导入日记</h3>
-                  <p className="text-subtext0 mb-4">支持导入 JSON 格式的文件</p>
+                  <Upload className="w-12 h-12 mx-auto mb-4 text-subtext0" />
+                  <h3 className="text-lg font-medium mb-2">导入日记文件</h3>
+                  <p className="text-subtext0 mb-4">选择之前导出的JSON文件进行批量导入</p>
                   <input
                     type="file"
                     id="import-file"
                     accept=".json"
                     className="hidden"
                     onChange={handleFileImport}
+                    disabled={isImporting}
                   />
-                  <Button variant="outline" onClick={() => document.getElementById('import-file')?.click()}>
-                    选择文件
+                  <Button 
+                    variant="outline" 
+                    onClick={() => document.getElementById('import-file')?.click()}
+                    disabled={isImporting}
+                  >
+                    {isImporting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        导入中...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="w-4 h-4 mr-2" />
+                        选择文件
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-subtext0 mt-4">
-                    导出的 JSON 文件可以直接导入
+                    支持从「设置」→「数据备份」导出的JSON文件
                   </p>
                 </div>
               </CardContent>
