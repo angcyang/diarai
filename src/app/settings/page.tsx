@@ -43,11 +43,12 @@ export default function SettingsPage() {
   useEffect(() => {
     const savedSettings = localStorage.getItem('diarai-ai-config')
     if (savedSettings) {
-      const config = JSON.parse(savedSettings)
-      setAiProvider(config.provider || 'qwen')
+      const config = JSON.parse(savedSettings) as { provider?: ProviderType; apiKey?: string; baseUrl?: string; model?: string }
+      const provider = config.provider || 'qwen'
+      setAiProvider(provider)
       setApiKey(config.apiKey || '')
-      setBaseUrl(config.baseUrl || AI_PROVIDERS[config.provider || 'qwen'].baseUrl)
-      setAiModel(config.model || AI_PROVIDERS[config.provider || 'qwen'].defaultModel)
+      setBaseUrl(config.baseUrl || AI_PROVIDERS[provider].baseUrl)
+      setAiModel(config.model || AI_PROVIDERS[provider].defaultModel)
     }
   }, [])
 
